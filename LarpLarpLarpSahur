@@ -1,28 +1,17 @@
 --[[
-    ╔═══════════════════════════════════════════════════════════════╗
-    ║                    NEBULA UI - ULTRA CUSTOM                   ║
-    ║                   Complete UI Library for Roblox              ║
-    ║                    Every pixel is configurable                ║
-    ╚═══════════════════════════════════════════════════════════════╝
+    NEBULA UI - ULTRA CUSTOM (CORRIGIDO)
 --]]
 
--- ============================================================================
--- 1. GLOBAL CONFIGURATION - MUDE TUDO AQUI
--- ============================================================================
-
 local Config = {
-    -- Window
     Window = {
         Size = { X = 520, Y = 400 },
-        Position = { X = 0.5, Y = 0.5 },  -- 0 a 1 (centro = 0.5)
+        Position = { X = 0.5, Y = 0.5 },
         MinSize = { X = 300, Y = 250 },
         MaxSize = { X = 1000, Y = 800 },
         Resizable = true,
         Draggable = true,
         CloseOnEscape = true,
     },
-    
-    -- Colors (RGBA)
     Colors = {
         Background = { R = 12, G = 12, B = 12, A = 0.92 },
         Sidebar = { R = 18, G = 18, B = 18, A = 0.95 },
@@ -35,8 +24,6 @@ local Config = {
         Muted = { R = 140, G = 140, B = 140, A = 1 },
         Outline = { R = 40, G = 40, B = 40, A = 1 },
     },
-    
-    -- Borders & Corners
     Borders = {
         WindowRadius = 12,
         SidebarRadius = 0,
@@ -49,8 +36,6 @@ local Config = {
         OutlineThickness = 1,
         OutlineTransparency = 0,
     },
-    
-    -- Sizes (pixels)
     Sizes = {
         TopbarHeight = 38,
         SidebarWidth = 140,
@@ -60,10 +45,8 @@ local Config = {
         SectionPadding = 10,
         IconSize = 16,
     },
-    
-    -- Fonts
     Fonts = {
-        Family = Enum.Font.Gotham,
+        Family = "rbxasset://fonts/family/GothamSSm.ttf",  -- CORRIGIDO
         TitleSize = 17,
         TabSize = 13,
         SectionSize = 14,
@@ -71,33 +54,23 @@ local Config = {
         ButtonSize = 13,
         ValueSize = 12,
     },
-    
-    -- Animations
     Animations = {
         Speed = 0.2,
         EasingStyle = Enum.EasingStyle.Quad,
         EasingDirection = Enum.EasingDirection.Out,
     },
-    
-    -- Icons
     Icons = {
         Enabled = true,
         Size = 16,
-        Color = nil,  -- nil = usa cor do texto
+        Color = nil,
     },
-    
-    -- Behavior
     Behavior = {
-        SavePosition = false,  -- salvar posição entre sessões
-        RememberTabs = false,   -- lembrar última aba
+        SavePosition = false,
+        RememberTabs = false,
         ShowLoading = true,
         LoadingText = "Nebula",
     },
 }
-
--- ============================================================================
--- 2. CORE UTILITIES
--- ============================================================================
 
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -106,7 +79,6 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local function rgb(c) return Color3.fromRGB(c.R, c.G, c.B) end
-local function rgba(c) return Color3.fromRGB(c.R, c.G, c.B), c.A end
 local function udim2(xs, xo, ys, yo) return UDim2.new(xs, xo, ys, yo) end
 local function udim(scale, offset) return UDim.new(scale, offset) end
 
@@ -130,57 +102,18 @@ local function Tween(obj, props, time)
     return t
 end
 
--- ============================================================================
--- 3. ICON SYSTEM
--- ============================================================================
-
-local IconCache = {}
-local function GetIcon(name, color)
-    if not Config.Icons.Enabled then return nil end
-    if IconCache[name] then return IconCache[name]:Clone() end
-    
-    local frame = Create("Frame", { BackgroundTransparency = 1, Size = udim2(0, Config.Icons.Size, 0, Config.Icons.Size) })
-    local icon = Create("ImageLabel", {
-        Parent = frame,
-        Size = udim2(1, 0, 1, 0),
-        BackgroundTransparency = 1,
-        Image = "rbxassetid://" .. (name == "home" and "6031094790" or name == "target" and "6031094790" or "6031094790"),
-        ImageColor3 = color or rgb(Config.Colors.Muted),
-    })
-    IconCache[name] = frame:Clone()
-    return frame
-end
-
--- ============================================================================
--- 4. THEME MANAGER
--- ============================================================================
-
-local ThemeManager = {
-    listeners = {},
-    subscribe = function(self, callback) table.insert(self.listeners, callback) end,
-    apply = function(self, target, targetType)
-        for _, cb in pairs(self.listeners) do cb(target, targetType) end
-    end,
-}
-
--- ============================================================================
--- 5. NOTIFICATION SYSTEM
--- ============================================================================
-
 local NotificationContainer = nil
 local function SetupNotifications()
     local parent = getUIParent()
     if parent:FindFirstChild("NebulaNotifs") then parent.NebulaNotifs:Destroy() end
-    
     local screen = Create("ScreenGui", { Parent = parent, Name = "NebulaNotifs", ResetOnSpawn = false })
     local container = Create("Frame", { Parent = screen, Size = udim2(1, -20, 1, -20), Position = udim2(0, 10, 0, 10), BackgroundTransparency = 1 })
-    local list = Create("UIListLayout", { Parent = container, Padding = udim(0, 8), VerticalAlignment = Enum.VerticalAlignment.Bottom, HorizontalAlignment = Enum.HorizontalAlignment.Right })
+    Create("UIListLayout", { Parent = container, Padding = udim(0, 8), VerticalAlignment = Enum.VerticalAlignment.Bottom, HorizontalAlignment = Enum.HorizontalAlignment.Right })
     NotificationContainer = container
 end
 
 local function Notify(props)
     if not NotificationContainer then SetupNotifications() end
-    
     local notif = Create("Frame", {
         Parent = NotificationContainer,
         Size = udim2(0, 280, 0, 40),
@@ -190,7 +123,6 @@ local function Notify(props)
     })
     Create("UICorner", { Parent = notif, CornerRadius = udim(0, Config.Borders.ElementRadius) })
     Create("UIStroke", { Parent = notif, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
-    
     local text = Create("TextLabel", {
         Parent = notif,
         Size = udim2(1, -20, 1, 0),
@@ -202,7 +134,6 @@ local function Notify(props)
         TextSize = Config.Fonts.LabelSize,
         TextXAlignment = Enum.TextXAlignment.Left,
     })
-    
     Tween(notif, { BackgroundTransparency = 0, Position = udim2(0, 0, 1, -50) }, 0.3)
     task.delay(props.Duration or 3, function()
         Tween(notif, { BackgroundTransparency = 1 }, 0.3)
@@ -211,14 +142,10 @@ local function Notify(props)
     end)
 end
 
--- ============================================================================
--- 6. UI ELEMENTS BUILDER
--- ============================================================================
-
 local ElementBuilder = {}
 
 function ElementBuilder:Label(p)
-    local label = Create("TextLabel", {
+    return Create("TextLabel", {
         Parent = p.Parent,
         Size = udim2(1, 0, 0, Config.Sizes.ButtonHeight),
         BackgroundTransparency = 1,
@@ -228,7 +155,6 @@ function ElementBuilder:Label(p)
         TextSize = Config.Fonts.LabelSize,
         TextXAlignment = Enum.TextXAlignment.Left,
     })
-    return { SetText = function(t) label.Text = "  " .. t end }
 end
 
 function ElementBuilder:Button(p)
@@ -245,11 +171,10 @@ function ElementBuilder:Button(p)
     })
     Create("UICorner", { Parent = btn, CornerRadius = udim(0, Config.Borders.ButtonRadius) })
     Create("UIStroke", { Parent = btn, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
-    
     btn.MouseEnter:Connect(function() Tween(btn, { BackgroundColor3 = rgb(Config.Colors.Hover) }, 0.1) end)
     btn.MouseLeave:Connect(function() Tween(btn, { BackgroundColor3 = rgb(Config.Colors.Element) }, 0.1) end)
     btn.MouseButton1Click:Connect(function() if p.Callback then p.Callback() end end)
-    return {}
+    return btn
 end
 
 function ElementBuilder:Toggle(p)
@@ -268,22 +193,19 @@ function ElementBuilder:Toggle(p)
     })
     Create("UICorner", { Parent = btn, CornerRadius = udim(0, Config.Borders.ButtonRadius) })
     Create("UIStroke", { Parent = btn, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
-    
     local indicator = Create("Frame", {
         Parent = btn,
         Size = udim2(0, 18, 0, 18),
         Position = udim2(1, -28, 0.5, -9),
-        BackgroundColor3 = state and rgb(Config.Colors.Accent) or rgb(Config.Colors.MainBG),
+        BackgroundColor3 = state and rgb(Config.Colors.Accent) or rgb(Config.Colors.Background),
     })
     Create("UICorner", { Parent = indicator, CornerRadius = udim(0, Config.Borders.ToggleRadius) })
     Create("UIStroke", { Parent = indicator, Color = rgb(Config.Colors.Outline), Thickness = 1 })
-    
     local function SetState(newState)
         state = newState
-        Tween(indicator, { BackgroundColor3 = state and rgb(Config.Colors.Accent) or rgb(Config.Colors.MainBG) }, 0.15)
+        Tween(indicator, { BackgroundColor3 = state and rgb(Config.Colors.Accent) or rgb(Config.Colors.Background) }, 0.15)
         if p.Callback then p.Callback(state) end
     end
-    
     btn.MouseButton1Click:Connect(function() SetState(not state) end)
     return { SetState = SetState, GetState = function() return state end }
 end
@@ -291,12 +213,10 @@ end
 function ElementBuilder:Slider(p)
     local min, max, default = p.Min or 0, p.Max or 100, p.Default or 50
     local decimals = p.Decimals or 1
-    
     local container = Create("Frame", { Parent = p.Parent, Size = udim2(1, 0, 0, 55), BackgroundTransparency = 1 })
     local bg = Create("Frame", { Parent = container, Size = udim2(1, 0, 1, 0), BackgroundColor3 = rgb(Config.Colors.Element) })
     Create("UICorner", { Parent = bg, CornerRadius = udim(0, Config.Borders.ElementRadius) })
     Create("UIStroke", { Parent = bg, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
-    
     local label = Create("TextLabel", {
         Parent = bg,
         Size = udim2(1, 0, 0, 25),
@@ -308,7 +228,6 @@ function ElementBuilder:Slider(p)
         TextSize = Config.Fonts.LabelSize,
         TextXAlignment = Enum.TextXAlignment.Left,
     })
-    
     local valueLabel = Create("TextLabel", {
         Parent = bg,
         Size = udim2(0, 50, 0, 25),
@@ -320,7 +239,6 @@ function ElementBuilder:Slider(p)
         TextSize = Config.Fonts.ValueSize,
         TextXAlignment = Enum.TextXAlignment.Right,
     })
-    
     local barBg = Create("Frame", {
         Parent = bg,
         Size = udim2(1, -16, 0, 5),
@@ -328,14 +246,12 @@ function ElementBuilder:Slider(p)
         BackgroundColor3 = rgb(Config.Colors.Background),
     })
     Create("UICorner", { Parent = barBg, CornerRadius = udim(1, 0) })
-    
     local fill = Create("Frame", {
         Parent = barBg,
         Size = udim2((default - min) / (max - min), 0, 1, 0),
         BackgroundColor3 = rgb(Config.Colors.Accent),
     })
     Create("UICorner", { Parent = fill, CornerRadius = udim(1, 0) })
-    
     local dragging = false
     local function UpdateValue(x)
         local pct = math.clamp((x - barBg.AbsolutePosition.X) / barBg.AbsoluteSize.X, 0, 1)
@@ -344,7 +260,6 @@ function ElementBuilder:Slider(p)
         valueLabel.Text = string.format("%." .. decimals .. "f", val)
         if p.Callback then p.Callback(val) end
     end
-    
     barBg.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
@@ -359,7 +274,6 @@ function ElementBuilder:Slider(p)
             UpdateValue(i.Position.X)
         end
     end)
-    
     return { SetValue = function(v) v = math.clamp(v, min, max); UpdateValue(barBg.AbsolutePosition.X + (v - min) / (max - min) * barBg.AbsoluteSize.X) end }
 end
 
@@ -378,13 +292,11 @@ function ElementBuilder:Keybind(p)
     })
     Create("UICorner", { Parent = btn, CornerRadius = udim(0, Config.Borders.ButtonRadius) })
     Create("UIStroke", { Parent = btn, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
-    
     local picking = false
     btn.MouseButton1Click:Connect(function()
         picking = true
         btn.Text = "  " .. (p.Text or "Keybind") .. " : [...]"
     end)
-    
     UserInputService.InputBegan:Connect(function(input, gpe)
         if picking and not gpe and input.UserInputType == Enum.UserInputType.Keyboard then
             picking = false
@@ -393,14 +305,13 @@ function ElementBuilder:Keybind(p)
             if p.Callback then p.Callback(key) end
         end
     end)
-    return {}
+    return btn
 end
 
 function ElementBuilder:Dropdown(p)
     local items = p.Items or {}
     local selected = p.Default or items[1] or "None"
     local open = false
-    
     local container = Create("Frame", { Parent = p.Parent, Size = udim2(1, 0, 0, Config.Sizes.ButtonHeight), BackgroundTransparency = 1 })
     local btn = Create("TextButton", {
         Parent = container,
@@ -415,7 +326,6 @@ function ElementBuilder:Dropdown(p)
     })
     Create("UICorner", { Parent = btn, CornerRadius = udim(0, Config.Borders.ButtonRadius) })
     Create("UIStroke", { Parent = btn, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
-    
     local dropdown = Create("Frame", {
         Parent = container,
         Size = udim2(1, 0, 0, #items * 28),
@@ -427,7 +337,6 @@ function ElementBuilder:Dropdown(p)
     Create("UICorner", { Parent = dropdown, CornerRadius = udim(0, Config.Borders.DropdownRadius) })
     Create("UIStroke", { Parent = dropdown, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
     Create("UIListLayout", { Parent = dropdown, Padding = udim(0, 2) })
-    
     for _, item in pairs(items) do
         local itemBtn = Create("TextButton", {
             Parent = dropdown,
@@ -448,23 +357,16 @@ function ElementBuilder:Dropdown(p)
             if p.Callback then p.Callback(selected) end
         end)
     end
-    
     btn.MouseButton1Click:Connect(function()
         open = not open
         dropdown.Visible = open
     end)
-    
-    return { SetItems = function(newItems) end, GetValue = function() return selected end }
+    return { SetItems = function() end, GetValue = function() return selected end }
 end
-
--- ============================================================================
--- 7. WINDOW BUILDER
--- ============================================================================
 
 local function BuildWindow(props)
     local uiParent = getUIParent()
     if uiParent:FindFirstChild("NebulaUI") then uiParent.NebulaUI:Destroy() end
-    
     local screen = Create("ScreenGui", { Parent = uiParent, Name = "NebulaUI", ResetOnSpawn = false })
     local main = Create("Frame", {
         Parent = screen,
@@ -477,8 +379,6 @@ local function BuildWindow(props)
     })
     Create("UICorner", { Parent = main, CornerRadius = udim(0, Config.Borders.WindowRadius) })
     Create("UIStroke", { Parent = main, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness, Transparency = Config.Borders.OutlineTransparency })
-    
-    -- Topbar
     local topbar = Create("Frame", {
         Parent = main,
         Size = udim2(1, 0, 0, Config.Sizes.TopbarHeight),
@@ -488,8 +388,6 @@ local function BuildWindow(props)
     })
     Create("UICorner", { Parent = topbar, CornerRadius = udim(0, Config.Borders.WindowRadius) })
     Create("Frame", { Parent = topbar, Size = udim2(1, 0, 1, 0), Position = udim2(0, 0, 1, -Config.Borders.WindowRadius), BackgroundColor3 = rgb(Config.Colors.Topbar), BackgroundTransparency = Config.Colors.Topbar.A, BorderSizePixel = 0 })
-    
-    -- Title
     local title = Create("TextLabel", {
         Parent = topbar,
         Size = udim2(1, -100, 1, 0),
@@ -501,8 +399,6 @@ local function BuildWindow(props)
         TextSize = Config.Fonts.TitleSize,
         TextXAlignment = Enum.TextXAlignment.Left,
     })
-    
-    -- Close button
     local closeBtn = Create("TextButton", {
         Parent = topbar,
         Size = udim2(0, 30, 0, 30),
@@ -514,8 +410,6 @@ local function BuildWindow(props)
         TextSize = 18,
     })
     closeBtn.MouseButton1Click:Connect(function() screen:Destroy() end)
-    
-    -- Resize handle
     if Config.Window.Resizable then
         local resize = Create("TextButton", {
             Parent = main,
@@ -546,8 +440,6 @@ local function BuildWindow(props)
             if i.UserInputType == Enum.UserInputType.MouseButton1 then resizing = false end
         end)
     end
-    
-    -- Dragging
     local dragging, dragStart, startFramePos
     topbar.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -565,8 +457,6 @@ local function BuildWindow(props)
     UserInputService.InputEnded:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
     end)
-    
-    -- Sidebar
     local sidebar = Create("ScrollingFrame", {
         Parent = main,
         Size = udim2(0, Config.Sizes.SidebarWidth, 1, -Config.Sizes.TopbarHeight),
@@ -579,18 +469,13 @@ local function BuildWindow(props)
     })
     Create("UIListLayout", { Parent = sidebar, Padding = udim(0, 5), HorizontalAlignment = Enum.HorizontalAlignment.Center })
     Create("UIPadding", { Parent = sidebar, PaddingTop = udim(0, 10) })
-    
-    -- Page holder
     local pageHolder = Create("Frame", {
         Parent = main,
         Size = udim2(1, -Config.Sizes.SidebarWidth, 1, -Config.Sizes.TopbarHeight),
         Position = udim2(0, Config.Sizes.SidebarWidth, 0, Config.Sizes.TopbarHeight),
         BackgroundTransparency = 1,
     })
-    
     local tabs = {}
-    
-    -- Tab builder
     local function AddTab(tabProps)
         local btn = Create("TextButton", {
             Parent = sidebar,
@@ -605,7 +490,6 @@ local function BuildWindow(props)
         })
         Create("UICorner", { Parent = btn, CornerRadius = udim(0, Config.Borders.ElementRadius) })
         Create("UIStroke", { Parent = btn, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
-        
         local page = Create("ScrollingFrame", {
             Parent = pageHolder,
             Size = udim2(1, 0, 1, 0),
@@ -616,21 +500,17 @@ local function BuildWindow(props)
         })
         Create("UIListLayout", { Parent = page, FillDirection = Enum.FillDirection.Horizontal, Padding = udim(0, 15) })
         Create("UIPadding", { Parent = page, PaddingLeft = udim(0, 15), PaddingRight = udim(0, 15), PaddingTop = udim(0, 15), PaddingBottom = udim(0, 15) })
-        
         local leftCol = Create("Frame", { Parent = page, Size = udim2(0.5, -8, 0, 0), BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.Y })
         Create("UIListLayout", { Parent = leftCol, Padding = udim(0, Config.Sizes.ElementSpacing) })
         local rightCol = Create("Frame", { Parent = page, Size = udim2(0.5, -8, 0, 0), Position = udim2(0.5, 8, 0, 0), BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.Y })
         Create("UIListLayout", { Parent = rightCol, Padding = udim(0, Config.Sizes.ElementSpacing) })
-        
         btn.MouseButton1Click:Connect(function()
             for _, t in pairs(tabs) do t.page.Visible = false; t.btn.BackgroundColor3 = rgb(Config.Colors.Background); t.btn.TextColor3 = rgb(Config.Colors.Muted) end
             page.Visible = true
             btn.BackgroundColor3 = rgb(Config.Colors.Element)
             btn.TextColor3 = rgb(Config.Colors.Text)
         end)
-        
         table.insert(tabs, { btn = btn, page = page, left = leftCol, right = rightCol })
-        
         local function AddSection(sectionProps)
             local col = sectionProps.Side == "right" and rightCol or leftCol
             local section = Create("Frame", {
@@ -644,7 +524,6 @@ local function BuildWindow(props)
             Create("UIStroke", { Parent = section, Color = rgb(Config.Colors.Outline), Thickness = Config.Borders.OutlineThickness })
             Create("UIListLayout", { Parent = section, Padding = udim(0, 8) })
             Create("UIPadding", { Parent = section, PaddingTop = udim(0, Config.Sizes.SectionPadding), PaddingBottom = udim(0, Config.Sizes.SectionPadding), PaddingLeft = udim(0, Config.Sizes.SectionPadding), PaddingRight = udim(0, Config.Sizes.SectionPadding) })
-            
             local header = Create("TextLabel", {
                 Parent = section,
                 Size = udim2(1, 0, 0, 24),
@@ -656,36 +535,13 @@ local function BuildWindow(props)
                 TextXAlignment = Enum.TextXAlignment.Left,
             })
             Create("Frame", { Parent = section, Size = udim2(1, 0, 0, 1), BackgroundColor3 = rgb(Config.Colors.Outline) })
-            
             local elements = Create("Frame", { Parent = section, Size = udim2(1, 0, 0, 0), BackgroundTransparency = 1, AutomaticSize = Enum.AutomaticSize.Y })
             Create("UIListLayout", { Parent = elements, Padding = udim(0, Config.Sizes.ElementSpacing) })
-            
             return setmetatable({ elements = elements }, { __index = ElementBuilder })
         end
-        
         return { Section = AddSection }
     end
-    
-    return { Tab = AddTab, Notify = Notify }
+    return { Tab = AddTab, Notify = Notify, Destroy = function() screen:Destroy() end }
 end
 
--- ============================================================================
--- 8. EXPORT
--- ============================================================================
-
-return {
-    Window = BuildWindow,
-    Config = Config,
-    Notify = Notify,
-    SetTheme = function(newConfig)
-        for k, v in pairs(newConfig) do
-            if Config[k] then
-                if type(v) == "table" then
-                    for k2, v2 in pairs(v) do Config[k][k2] = v2 end
-                else
-                    Config[k] = v
-                end
-            end
-        end
-    end,
-}
+return { Window = BuildWindow, Config = Config, Notify = Notify }
